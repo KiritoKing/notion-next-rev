@@ -1,16 +1,26 @@
-import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
+import { useEffect, useMemo, useState } from "react";
 
 export function useDarkMode() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { theme } = useTheme();
+  const [isSystemDarkMode, setIsSystemDarkMode] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    setIsDarkMode(mediaQuery.matches);
+    setIsSystemDarkMode(mediaQuery.matches);
 
-    const handler = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
+    const handler = (e: MediaQueryListEvent) => setIsSystemDarkMode(e.matches);
     mediaQuery.addEventListener("change", handler);
     return () => mediaQuery.removeEventListener("change", handler);
   }, []);
+
+  const isDarkMode = useMemo(() => {
+    if (theme === "system") {
+      return isSystemDarkMode;
+    } else {
+      return theme === "dark";
+    }
+  }, [theme, isSystemDarkMode]);
 
   return isDarkMode;
 }

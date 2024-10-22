@@ -1,6 +1,6 @@
 import React from "react";
 
-import NotionPage from "@/components/NotionPage";
+import NotionPage from "@/components/blog/NotionPage";
 import { getPageData } from "@/service/notion";
 
 type RouteProps = {

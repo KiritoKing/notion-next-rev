@@ -1,25 +1,67 @@
+"use client";
+
 import Image from "next/image";
 import React from "react";
+import { TypeAnimation } from "react-type-animation";
 
-const HeroBanner = () => {
+import { cn } from "@/lib/utils";
+
+interface BackgroundImageProps
+  extends Omit<
+    Partial<Parameters<typeof Image>[0]>,
+    "src" | "width" | "height"
+  > {
+  src: string;
+  width: number;
+  height: number;
+}
+
+interface Props {
+  backgroundImage: {
+    light: BackgroundImageProps;
+    dark: BackgroundImageProps;
+  };
+  title?: React.ReactNode;
+  typeSequence?: string[];
+}
+
+const HeroBanner: React.FC<Props> = ({
+  backgroundImage,
+  title,
+  typeSequence,
+}) => {
+  const { className: lightClassName, ...lightProps } = backgroundImage.light;
+  const { className: darkClassName, ...darkProps } = backgroundImage.dark;
+
   return (
-    <div className="relative h-screen w-screen overflow-hidden">
+    <div className="relative flex h-screen w-screen flex-col items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
         <Image
-          src="https://chlorinec.top/images/wallhaven-wqery6-light.webp"
           alt="background-light"
-          className="inline-block h-full w-full object-cover object-center dark:hidden"
-          width={1920}
-          height={1080}
+          className={cn(
+            "inline-block h-full w-full object-cover object-center dark:hidden",
+            lightClassName,
+          )}
+          {...lightProps}
         />
-
         <Image
-          src="https://chlorinec.top/images/wallhaven-wqery6-dark.webp"
           alt="background-dark"
-          className="hidden h-full w-full object-cover object-center dark:inline-block"
-          width={1920}
-          height={1080}
+          className={cn(
+            "hidden h-full w-full object-cover object-center dark:inline-block",
+            darkClassName,
+          )}
+          {...darkProps}
         />
+      </div>
+      <div className="z-10 text-center">
+        {title && <h3 className="text-3xl font-extrabold">{title}</h3>}
+        {typeSequence && (
+          <TypeAnimation
+            sequence={typeSequence?.map((item) => [item, 1000]).flat()}
+            speed={50}
+            repeat={Infinity}
+          />
+        )}
       </div>
     </div>
   );

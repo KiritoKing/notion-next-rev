@@ -5,6 +5,9 @@ import "react-notion-x/src/styles.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 
+import NavBar from "@/components/common/NavBar";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -31,7 +34,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <NavBar title="ChlorineC's Blog" />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
