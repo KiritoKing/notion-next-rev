@@ -1,6 +1,9 @@
+import "./globals.css";
+// core styles shared by all of react-notion-x (required)
+import "react-notion-x/src/styles.css";
+
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import "./globals.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
