@@ -21,6 +21,7 @@ interface Props {
 }
 
 export const BlogListItem: React.FC<BlogItem> = ({
+  id,
   title,
   pubDate,
   tags,
@@ -28,7 +29,9 @@ export const BlogListItem: React.FC<BlogItem> = ({
 }) => (
   <div className="card bg-base-100 shadow-lg">
     <div className="card-body">
-      <h4 className="card-title">{title}</h4>
+      <h4 className="card-title">
+        <Link href={`/blog/${id}}`}>{title}</Link>
+      </h4>
       {excerpt && <details>{excerpt}</details>}
       <footer className="card-actions flex items-center">
         <time className="flex items-center gap-2">
@@ -56,9 +59,7 @@ const BlogList: React.FC<Props> = ({ blogs, className }) => {
     <ul className={cn("mx-auto max-w-[1200px] space-y-10", className)}>
       {blogs.map((blog) => (
         <li key={blog.id}>
-          <Link href={`/blog/${blog.id}`}>
-            <BlogListItem {...blog} />
-          </Link>
+          <BlogListItem {...blog} />
         </li>
       ))}
     </ul>
