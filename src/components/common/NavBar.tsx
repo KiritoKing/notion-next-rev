@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React from "react";
+
+import { cn } from "@/lib/utils";
 
 import { LightDarkToggle } from "../ui/light-dark-toggle";
 
@@ -10,8 +13,15 @@ interface Props {
 }
 
 const NavBar: React.FC<Props> = ({ title }) => {
+  const pathname = usePathname();
+
   return (
-    <nav className="navbar sticky top-0 z-10 bg-opacity-30 px-20 backdrop-blur-lg backdrop-filter">
+    <nav
+      className={cn(
+        "navbar top-0 z-10 bg-opacity-30 px-20 backdrop-blur-lg backdrop-filter",
+        pathname === "/" ? "fixed" : "sticky",
+      )}
+    >
       <div className="mx-auto flex w-full justify-between">
         <h1 className="flex-1 text-xl font-bold">
           <Link href="/">{title}</Link>
