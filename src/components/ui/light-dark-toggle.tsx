@@ -3,6 +3,7 @@
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import * as React from "react";
+import { themeChange } from "theme-change";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +14,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function LightDarkToggle() {
-  const { setTheme } = useTheme();
+  const { setTheme: setThemeNext, theme } = useTheme();
+
+  const setTheme = (theme: string) => {
+    setThemeNext(theme); // 控制next和shadcn的主题
+  };
+
+  React.useEffect(() => {
+    themeChange(false);
+    document.documentElement.setAttribute("data-theme", theme ?? "");
+  }, [theme]);
 
   return (
     <DropdownMenu>
@@ -26,14 +36,40 @@ export function LightDarkToggle() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
+          <button data-set-theme="light" data-act-class="ACTIVECLASS">
+            Light
+          </button>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
+          <button data-set-theme="dark" data-act-class="ACTIVECLASS">
+            Dark
+          </button>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
+          <button data-set-theme="" data-act-class="ACTIVECLASS">
+            System
+          </button>
         </DropdownMenuItem>
+
+        {/* <form onSubmit={(e) => e.preventDefault()}>
+          <label>
+            <input
+              type="radio"
+              name="theme"
+              value="light"
+              className="theme-controller hidden"
+            />
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="theme"
+              value="dark"
+              className="theme-controller hidden"
+            />
+          </label>
+          <label></label>
+        </form> */}
       </DropdownMenuContent>
     </DropdownMenu>
   );
