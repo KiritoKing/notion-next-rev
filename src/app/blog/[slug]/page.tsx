@@ -1,19 +1,32 @@
+import type { Metadata, ResolvingMetadata } from "next";
 import React from "react";
 
 import NotionPage from "@/components/blog/NotionPage";
-import { getPageData } from "@/service/notion";
+import { getPageDataWithCache } from "@/service/notion";
 
-type RouteProps = {
+type Props = {
   params: {
     slug: string;
   };
 };
 
-const BlogPage = async ({ params }: RouteProps) => {
-  const recordMap = await getPageData(params.slug);
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
+  // read route params
+  const { metadata } = await getPageDataWithCache(params.slug);
+
+  return {
+    title: `${metadata.title ?? "Article"} - ${(await parent).title?.absolute}`,
+  };
+}
+
+const BlogPage = async ({ params }: Props) => {
+  const { recordMap, metadata } = await getPageDataWithCache(params.slug);
   return (
     <div>
-      <NotionPage recordMap={recordMap} />
+      <NotionPage recordMap={recordMap} metadata={metadata} />
     </div>
   );
 };

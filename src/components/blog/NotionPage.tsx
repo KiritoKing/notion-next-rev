@@ -4,10 +4,12 @@
 "use client";
 import dynamic from "next/dynamic";
 import React from "react";
-// import dynamic from "next/dynamic";
 import { NotionRenderer } from "react-notion-x";
 
 import { useDarkMode } from "@/hooks/useDarkMode";
+
+import BlogHeader from "./BlogHeader";
+import type { BlogItem } from "./BlogList";
 
 const Code = dynamic(() =>
   import("react-notion-x/build/third-party/code").then(async (m) => {
@@ -71,10 +73,11 @@ const Code = dynamic(() =>
 // );
 
 export interface Props {
+  metadata: Partial<BlogItem>;
   recordMap: Parameters<typeof NotionRenderer>[0]["recordMap"];
 }
 
-const NotionPage: React.FC<Props> = ({ recordMap }) => {
+const NotionPage: React.FC<Props> = ({ recordMap, metadata }) => {
   const isDarkMode = useDarkMode();
 
   return (
@@ -82,6 +85,8 @@ const NotionPage: React.FC<Props> = ({ recordMap }) => {
       mapPageUrl={(pageId) => `/blog/${pageId}`}
       recordMap={recordMap}
       darkMode={isDarkMode}
+      pageHeader={<BlogHeader metadata={metadata} />}
+      disableHeader
       components={{
         Code,
         // Collection,
