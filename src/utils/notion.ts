@@ -11,10 +11,24 @@ export type Block = ExtendedRecordMap["block"][string];
 export type BlockValue = Block["value"];
 export type Property = BlockValue["properties"][string];
 
+/**
+ * Notion API中很多property的格式是 `any[][]` 这样的，比如 [["foo"]]
+ *
+ * 这个函数的作用是从这种格式（[["foo"]]）中提取出 "foo"
+ * @param value API输出property格式，形如 [["foo"]]
+ * @returns 提取出的值，形如 "foo"
+ * @example
+ * const title = extractProperty(block.properties.title);
+ */
 export function extractProperty<T = any>(value: Property): T | undefined {
   return value?.[0]?.[0];
 }
 
+/**
+ * 针对提取标题这个高频场景的简单封装
+ * @param block 一定是PageBlock，才能保证有title
+ * @returns 若有title，提取出title，否则返回`undefined`
+ */
 export function extractTitleFromPageBlock(block: Block) {
   if (
     block.value?.type === "page" &&
@@ -25,6 +39,11 @@ export function extractTitleFromPageBlock(block: Block) {
   }
 }
 
+/**
+ * 针对获取全页数据的属性做的简单封装
+ * @param wholePage
+ * @returns
+ */
 export function getMappedPropertiesFromPage(
   wholePage: ExtendedRecordMap,
 ): Record<string, { value: string; schema: PropertySchema[string] }> {
@@ -33,12 +52,23 @@ export function getMappedPropertiesFromPage(
     return {};
   }
   const collection = getMapValue(wholePage.collection);
+  if (!collection) {
+    return {};
+  }
   const properties = pageBlock.value.properties;
   const schema = collection.value.schema;
 
   return getMappedProperties(properties, schema);
 }
 
+/**
+ * 将Notion API的property对象（rawProps）的key是一个hash-id，其真实名称存储在 `page.collection.schema` 中
+ *
+ * 该函数将原property对象利用schema进行还原，输出正确的名称key
+ * @param rawProps Notion API得到的property对象
+ * @param schema Notion API得到的`collection.schema`对象
+ * @returns 还原正确名称后的property
+ */
 export function getMappedProperties(
   rawProps: any,
   schema: PropertySchema,
@@ -62,22 +92,20 @@ export function getMappedProperties(
 }
 
 /**
- * Given a map and a key, return the value associated with that key.
+ * 由于Notion API的返回值有很多Map，为了方便取用Map中的值，提供了这个函数，并提供默认的类型推导
  *
- * The key can be either a string or a number. If the key is a number, it is
- * treated as an index into the array of keys in the map. If the key is a
- * string, it is treated as a key into the map.
+ * 该函数一般用于提取Map中的第一个值，也可以提取指定key的值
  *
- * @param map The map to extract the value from.
- * @param key The key to extract the value for. If not provided, the first key
- * in the map is used.
- * @returns The value associated with the key, or undefined if the key is not
- * present in the map.
+ * @param map 形如`Record<string, any>`的值
+ * @param key 可留空，若留空则取第一个值，不留空则取指定值
+ * @returns 返回对应的值，可能得到`undefined`
+ * @example
+ * const collection = getMapValue(databasePage.collection)?.value;
  */
 export function getMapValue<T extends Record<string, any>>(
   map: T,
   key: number | string = 0,
-): T[keyof T] {
+): T[keyof T] | undefined {
   if (typeof key === "number") {
     return map[Object.keys(map)[key]];
   } else {

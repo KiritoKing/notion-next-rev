@@ -67,7 +67,12 @@ export async function parseDatabase(
   const databasePage = await notion.getPage(databaseId); // 解析数据库的请求不走lru缓存，依赖nextjs的静态页面缓存
 
   const blockMap = databasePage.block;
-  const collection = getMapValue(databasePage.collection).value;
+  const collection = getMapValue(databasePage.collection)?.value;
+
+  if (!collection) {
+    throw new Error("No collection found in database");
+  }
+
   const schema = collection.schema;
 
   const tableView = Object.values(databasePage.collection_view).find(
