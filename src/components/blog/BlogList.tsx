@@ -32,7 +32,7 @@ export const BlogListItem: React.FC<BlogItem> = ({
       <h4 className="card-title">
         <Link href={`/blog/${id}}`}>{title}</Link>
       </h4>
-      {excerpt && <details>{excerpt}</details>}
+      {excerpt && <div>{excerpt}</div>}
       <footer className="card-actions flex items-center">
         <time className="flex items-center gap-2">
           <Icon icon="uiw:date" />

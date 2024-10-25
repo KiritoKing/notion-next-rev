@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NotionRenderer } from "react-notion-x";
 
-type ExtendedRecordMap = Parameters<typeof NotionRenderer>[0]["recordMap"];
-type Collection = ExtendedRecordMap["collection"][string];
-type CollectionValue = Collection["value"];
-type Block = ExtendedRecordMap["block"][string];
-type BlockValue = Block["value"];
-type Property = BlockValue["properties"][string];
+export type ExtendedRecordMap = Parameters<
+  typeof NotionRenderer
+>[0]["recordMap"];
+export type Collection = ExtendedRecordMap["collection"][string];
+export type CollectionValue = Collection["value"];
+export type PropertySchema = CollectionValue["schema"];
+export type Block = ExtendedRecordMap["block"][string];
+export type BlockValue = Block["value"];
+export type Property = BlockValue["properties"][string];
 
 export function extractProperty<T = any>(value: Property): T | undefined {
   return value?.[0]?.[0];
@@ -22,12 +25,9 @@ export function extractTitleFromPageBlock(block: Block) {
   }
 }
 
-export function getMappedProperties(
+export function getMappedPropertiesFromPage(
   wholePage: ExtendedRecordMap,
-): Record<
-  string,
-  { value: string; schema: CollectionValue["schema"][string] }
-> {
+): Record<string, { value: string; schema: PropertySchema[string] }> {
   const pageBlock = Object.values(wholePage.block)[0];
   if (!pageBlock) {
     return {};
@@ -36,16 +36,23 @@ export function getMappedProperties(
   const properties = pageBlock.value.properties;
   const schema = collection.value.schema;
 
+  return getMappedProperties(properties, schema);
+}
+
+export function getMappedProperties(
+  rawProps: any,
+  schema: PropertySchema,
+): Record<string, { value: string; schema: PropertySchema[string] }> {
   const mappedProperties: Record<
     string,
-    Property & { schema: CollectionValue["schema"][string] }
+    Property & { schema: PropertySchema[string] }
   > = {};
 
-  for (const key in properties) {
+  for (const key in rawProps) {
     const propSchema = schema[key];
     if (propSchema?.name) {
       mappedProperties[propSchema.name] = {
-        value: extractProperty(properties[key]),
+        value: extractProperty(rawProps[key]),
         schema: propSchema,
       };
     }
