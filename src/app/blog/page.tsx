@@ -1,12 +1,11 @@
 import React from "react";
 
 import BlogList from "@/components/blog/BlogList";
-import { parseDatabase } from "@/service/notion";
+import { getNotionContextWithCache } from "@/service/notion";
 
 const BlogPage = async () => {
-  const { pageEntries, categoryFilters, tagFilters } = await parseDatabase(
-    process.env.DATABASE_ID,
-  );
+  const { pageEntries, categoryFilters, tagFilters } =
+    await getNotionContextWithCache(process.env.DATABASE_ID);
 
   console.log(categoryFilters, tagFilters);
 

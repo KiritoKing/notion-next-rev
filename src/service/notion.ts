@@ -58,7 +58,7 @@ export interface NotionContext {
   categoryFilters: Record<string, string[]>;
 }
 
-export async function parseDatabase(
+export async function fetchNotionContext(
   databaseId?: string,
 ): Promise<NotionContext> {
   if (!databaseId) {
@@ -144,6 +144,8 @@ export async function parseDatabase(
     categoryFilters,
   };
 }
+
+export const getNotionContextWithCache = cache(fetchNotionContext);
 
 export const clearCache = () => {
   pageCache.clear();
