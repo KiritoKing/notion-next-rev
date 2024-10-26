@@ -58,13 +58,29 @@ export interface NotionContext {
   categoryFilters: Record<string, string[]>;
 }
 
+const databaseCache = {
+  recordMap: null as ExtendedRecordMap | null,
+  context: null as NotionContext | null,
+};
+
 export async function fetchNotionContext(
   databaseId?: string,
+  bypassCache = false,
 ): Promise<NotionContext> {
   if (!databaseId) {
     throw new Error("You must provide DATABASE_ID in environment variables");
   }
-  const databasePage = await notion.getPage(databaseId); // 解析数据库的请求不走lru缓存，依赖nextjs的静态页面缓存
+  if (databaseCache.context && !bypassCache) {
+    return databaseCache.context;
+  }
+
+  let databasePage: ExtendedRecordMap;
+  if (databaseCache.recordMap && !bypassCache) {
+    databasePage = databaseCache.recordMap;
+  } else {
+    databasePage = await notion.getPage(databaseId);
+    databaseCache.recordMap = databasePage;
+  }
 
   const blockMap = databasePage.block;
   const collection = getMapValue(databasePage.collection)?.value;
@@ -138,15 +154,20 @@ export async function fetchNotionContext(
     }
   });
 
-  return {
+  const context = {
     pageEntries,
     tagFilters,
     categoryFilters,
   };
+
+  databaseCache.context = context;
+  return context;
 }
 
 export const getNotionContextWithCache = cache(fetchNotionContext);
 
 export const clearCache = () => {
   pageCache.clear();
+  databaseCache.recordMap = null;
+  databaseCache.context = null;
 };

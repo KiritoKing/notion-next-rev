@@ -30,7 +30,8 @@
     "server-only": "^0.0.1",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "theme-change": "^2.5.0"
+    "theme-change": "^2.5.0",
+    "unstated-next": "^1.1.0"
   },
   "devDependencies": {
     "@iconify/react": "^5.0.2",

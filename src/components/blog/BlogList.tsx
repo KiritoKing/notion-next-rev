@@ -15,48 +15,60 @@ export interface BlogItem {
   coverImage?: string;
 }
 
+export const BlogListItem: React.FC<
+  (BlogItem & { skeleton?: false }) | { skeleton: true }
+> = (props) => {
+  return (
+    <div className="card bg-base-100 shadow-lg">
+      <div className="card-body">
+        <h4 className="card-title">
+          {props.skeleton ? (
+            <span className="skeleton h-4 w-1/2" />
+          ) : (
+            <Link href={`/blog/${props.id}}`}>{props.title}</Link>
+          )}
+        </h4>
+        {props.skeleton ? (
+          <div className="skeleton h-16 w-full" />
+        ) : (
+          props.excerpt && <div>{props.excerpt}</div>
+        )}
+        <footer className="card-actions flex items-center">
+          {props.skeleton ? (
+            <div className="skeleton h-4 w-20" />
+          ) : (
+            <>
+              <time className="flex items-center gap-2">
+                <Icon icon="uiw:date" />
+                {dayjs(props.pubDate).format("YYYY-MM-DD")}
+              </time>
+              {props.tags && (
+                <div className="flex items-center gap-2">
+                  {props.tags.map((tag) => (
+                    <div key={tag} className="badge">
+                      <Link href={`/tag/${tag}`} className="link">
+                        #{tag}
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </footer>
+      </div>
+    </div>
+  );
+};
+
 interface Props {
   blogs: BlogItem[];
   className?: string;
 }
 
-export const BlogListItem: React.FC<BlogItem> = ({
-  id,
-  title,
-  pubDate,
-  tags,
-  excerpt,
-}) => (
-  <div className="card bg-base-100 shadow-lg">
-    <div className="card-body">
-      <h4 className="card-title">
-        <Link href={`/blog/${id}}`}>{title}</Link>
-      </h4>
-      {excerpt && <div>{excerpt}</div>}
-      <footer className="card-actions flex items-center">
-        <time className="flex items-center gap-2">
-          <Icon icon="uiw:date" />
-          {dayjs(pubDate).format("YYYY-MM-DD")}
-        </time>
-        {tags && (
-          <div className="flex items-center gap-2">
-            {tags.map((tag) => (
-              <div key={tag} className="badge">
-                <Link href={`/tag/${tag}`} className="link">
-                  #{tag}
-                </Link>
-              </div>
-            ))}
-          </div>
-        )}
-      </footer>
-    </div>
-  </div>
-);
-
 const BlogList: React.FC<Props> = ({ blogs, className }) => {
   return (
-    <ul className={cn("mx-auto max-w-[1200px] space-y-10", className)}>
+    <ul className={cn("space-y-10", className)}>
       {blogs.map((blog) => (
         <li key={blog.id}>
           <BlogListItem {...blog} />
@@ -65,5 +77,17 @@ const BlogList: React.FC<Props> = ({ blogs, className }) => {
     </ul>
   );
 };
+
+interface SkeletonProps {
+  num?: number;
+}
+
+export const BlogListSkeleton: React.FC<SkeletonProps> = ({ num = 10 }) => (
+  <div className="space-y-10">
+    {Array.from({ length: num }, (_, i) => (
+      <BlogListItem skeleton key={i} />
+    ))}
+  </div>
+);
 
 export default BlogList;

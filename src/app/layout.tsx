@@ -7,7 +7,6 @@ import type { Metadata } from "next";
 import NavBar from "@/components/common/NavBar";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
-
 export const metadata: Metadata = {
   title: "ChlorineC's Blog",
   description: "ChlorineC's Blog",
@@ -20,9 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} max-w-full overflow-x-hidden antialiased`}
-      >
+      <body className="max-w-full overflow-x-hidden antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
