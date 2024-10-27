@@ -1,7 +1,15 @@
 import React from "react";
 
-const BlogPageLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
-  return <div className="bg-transparent py-20">{children}</div>;
+type Props = {
+  params: {
+    slug: string;
+  };
+};
+
+const BlogPageLayout: React.FC<React.PropsWithChildren<Props>> = ({
+  children,
+}) => {
+  return <div className="relative bg-transparent">{children}</div>;
 };
 
 export default BlogPageLayout;

@@ -2,6 +2,7 @@ import type { Metadata, ResolvingMetadata } from "next";
 import React from "react";
 
 import NotionPage from "@/components/blog/NotionPage";
+import TableOfContent from "@/components/blog/TableOfContent";
 import { getPageDataWithCache } from "@/service/notion";
 
 type Props = {
@@ -23,10 +24,13 @@ export async function generateMetadata(
 }
 
 const BlogPage = async ({ params }: Props) => {
-  const { recordMap, metadata } = await getPageDataWithCache(params.slug);
+  const { recordMap, metadata, toc } = await getPageDataWithCache(params.slug);
   return (
-    <div>
+    <div id="notion-container" className="relative">
       <NotionPage recordMap={recordMap} metadata={metadata} />
+      <div className="fixed right-0 top-1/4">
+        <TableOfContent toc={toc} />
+      </div>
     </div>
   );
 };
