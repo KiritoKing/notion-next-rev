@@ -8,10 +8,12 @@ import type { NotionRenderer } from "react-notion-x";
 import type { BlogItem } from "@/components/blog/BlogList";
 import {
   ExtendedRecordMap,
+  extractProperty,
   getMappedProperties,
   getMappedPropertiesFromPage,
   getMapValue,
 } from "@/utils/notion";
+import { memoize } from "lodash";
 
 const notion = new NotionAPI({
   authToken: process.env.NOTION_TOKEN,
@@ -23,9 +25,18 @@ const pageCache = new LRUCache<string, ExtendedRecordMap>({
   fetchMethod: async (key) => await notion.getPage(key),
 });
 
+export interface TOCItem {
+  id: string;
+  level: number;
+  text: string;
+  parent: TOCItem | null;
+  children?: TOCItem[];
+}
+
 export interface PageData {
   metadata: Partial<BlogItem>;
   recordMap: Parameters<typeof NotionRenderer>[0]["recordMap"];
+  toc: TOCItem[];
 }
 
 export const getPageDataWithCache = cache(
@@ -38,6 +49,45 @@ export const getPageDataWithCache = cache(
       pageCache.set(pageId, recordMap);
     }
     const properties = getMappedPropertiesFromPage(recordMap);
+    // 获取目录
+    const toc: TOCItem[] = [];
+    let previousAnchor: TOCItem | null = null;
+    const headers = Object.values(recordMap.block)
+      .filter((block) => block.value?.type.includes("header"))
+      .map((block) => {
+        return block.value;
+      });
+
+    headers.forEach((header) => {
+      const level = header.type.split("_").reduce((acc, cur) => {
+        if (cur === "sub") {
+          return acc + 1;
+        }
+        return acc;
+      }, 1);
+      const text = extractProperty(header.properties.title);
+      if (!text) {
+        return;
+      }
+      const h: TOCItem = {
+        id: header.id.replace(/-/g, ""),
+        level,
+        text: extractProperty(header.properties.title) ?? "",
+        parent: null,
+      };
+      let parent = previousAnchor;
+      while (parent && parent.level >= level) {
+        parent = parent.parent;
+      }
+      if (parent) {
+        h.parent = parent;
+        parent.children ||= [];
+        parent.children.push(h);
+      } else {
+        toc.push(h);
+      }
+      previousAnchor = h;
+    });
 
     return {
       metadata: {
@@ -45,6 +95,7 @@ export const getPageDataWithCache = cache(
         tags: properties.tag?.value.split(",") ?? [],
       },
       recordMap,
+      toc,
     };
   },
 );
@@ -58,29 +109,14 @@ export interface NotionContext {
   categoryFilters: Record<string, string[]>;
 }
 
-const databaseCache = {
-  recordMap: null as ExtendedRecordMap | null,
-  context: null as NotionContext | null,
-};
-
 export async function fetchNotionContext(
   databaseId?: string,
-  bypassCache = false,
 ): Promise<NotionContext> {
   if (!databaseId) {
     throw new Error("You must provide DATABASE_ID in environment variables");
   }
-  if (databaseCache.context && !bypassCache) {
-    return databaseCache.context;
-  }
 
-  let databasePage: ExtendedRecordMap;
-  if (databaseCache.recordMap && !bypassCache) {
-    databasePage = databaseCache.recordMap;
-  } else {
-    databasePage = await notion.getPage(databaseId);
-    databaseCache.recordMap = databasePage;
-  }
+  const databasePage = await notion.getPage(databaseId);
 
   const blockMap = databasePage.block;
   const collection = getMapValue(databasePage.collection)?.value;
@@ -160,14 +196,13 @@ export async function fetchNotionContext(
     categoryFilters,
   };
 
-  databaseCache.context = context;
   return context;
 }
 
-export const getNotionContextWithCache = cache(fetchNotionContext);
+const memoizedFetchNotionContext = memoize(fetchNotionContext);
+export const getNotionContextWithCache = cache(memoizedFetchNotionContext);
 
 export const clearCache = () => {
   pageCache.clear();
-  databaseCache.recordMap = null;
-  databaseCache.context = null;
+  memoizedFetchNotionContext.cache.clear?.();
 };

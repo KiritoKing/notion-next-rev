@@ -19,7 +19,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "target": "ESNext" // 输出的语法等级，对应了允许的语法等级
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
