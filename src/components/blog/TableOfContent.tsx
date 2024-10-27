@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@iconify/react";
 import mitt from "mitt";
 import Link from "next/link";
 import React, {
@@ -12,7 +13,6 @@ import React, {
 
 import { cn } from "@/lib/utils";
 import type { TOCItem } from "@/service/notion";
-import { Icon } from "@iconify/react";
 
 const IndentMap: Record<number, string> = {
   1: "ml-2",
