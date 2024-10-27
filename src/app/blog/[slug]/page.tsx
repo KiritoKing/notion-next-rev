@@ -28,9 +28,9 @@ const BlogPage = async ({ params }: Props) => {
   return (
     <div id="notion-container" className="relative">
       <NotionPage recordMap={recordMap} metadata={metadata} />
-      <div className="fixed right-0 top-1/4">
+      <aside className="fixed right-0 top-1/4">
         <TableOfContent toc={toc} />
-      </div>
+      </aside>
     </div>
   );
 };
