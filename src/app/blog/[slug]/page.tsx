@@ -2,7 +2,7 @@ import type { Metadata, ResolvingMetadata } from "next";
 import React from "react";
 
 import NotionPage from "@/components/blog/NotionPage";
-import TableOfContent from "@/components/blog/TableOfContent";
+import List from "@/components/blog/TableOfContent";
 import { getPageDataWithCache } from "@/service/notion";
 
 type Props = {
@@ -29,7 +29,7 @@ const BlogPage = async ({ params }: Props) => {
     <div id="notion-container" className="relative">
       <NotionPage recordMap={recordMap} metadata={metadata} />
       <aside className="fixed right-0 top-1/4">
-        <TableOfContent toc={toc} />
+        <List toc={toc} />
       </aside>
     </div>
   );

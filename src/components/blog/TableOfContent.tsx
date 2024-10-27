@@ -10,8 +10,9 @@ import React, {
   useState,
 } from "react";
 
-import type { TOCItem } from "@/service/notion";
 import { cn } from "@/lib/utils";
+import type { TOCItem } from "@/service/notion";
+import { Icon } from "@iconify/react";
 
 const IndentMap: Record<number, string> = {
   1: "ml-2",
@@ -60,15 +61,13 @@ const Item: React.FC<TOCItem> = ({ id, text, level, children }) => {
         className={cn(
           "transition-all",
           isHighlight
-            ? "font-bold text-purple-700 underline underline-offset-4"
+            ? "font-bold text-purple-700 underline underline-offset-4 dark:text-purple-300"
             : "",
         )}
       >
         {text}
       </Link>
-      {children && (
-        <TableOfContent toc={children} className={IndentMap[level]} nested />
-      )}
+      {children && <List toc={children} className={IndentMap[level]} nested />}
     </li>
   );
 };
@@ -79,7 +78,7 @@ export interface Props {
   nested?: boolean;
 }
 
-const TableOfContent: React.FC<Props> = ({ toc, className, nested }) => {
+const List: React.FC<Props> = ({ toc, className, nested }) => {
   const eventBusRef = useRef<ReturnType<typeof mitt<TocEvents>> | null>(null);
 
   useEffect(() => {
@@ -116,7 +115,7 @@ const TableOfContent: React.FC<Props> = ({ toc, className, nested }) => {
     <EventContext.Provider value={eventBusRef}>
       <ul
         className={cn(
-          "max-h-[500px] max-w-[300px] overflow-y-auto text-wrap",
+          "max-h-[500px] max-w-[300px] overflow-y-auto text-wrap pr-4",
           nested ? "max-h-none max-w-none" : "",
           className,
         )}
@@ -129,4 +128,73 @@ const TableOfContent: React.FC<Props> = ({ toc, className, nested }) => {
   );
 };
 
-export default TableOfContent;
+const TableOfContents: React.FC<Omit<Props, "nested">> = ({
+  className,
+  ...props
+}) => {
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showTocMobile, setShowTocMobile] = useState(false);
+
+  const toggleTocMobile = () => {
+    setShowTocMobile(!showTocMobile);
+  };
+
+  const handleScrollTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  return (
+    <div className={cn("relative", className)}>
+      <div className="flex justify-end">
+        <button
+          onClick={toggleTocMobile}
+          className="btn btn-ghost mb-6 translate-x-1/4 rounded-badge border border-solid border-gray-800 bg-base-100 transition-transform dark:border-gray-100 xl:hidden"
+        >
+          <Icon
+            icon="duo-icons:menu"
+            className={cn("size-10", showTocMobile ? "rotate-180" : "")}
+          ></Icon>
+        </button>
+      </div>
+
+      <div
+        className={cn(
+          "rounded-l-lg bg-base-100 p-4 shadow-lg",
+          showTocMobile
+            ? "animate-slide-in-from-right"
+            : "animate-slide-out-to-right",
+          "xl:animate-none xl:rounded-none xl:bg-transparent xl:p-0 xl:shadow-none",
+        )}
+      >
+        <List {...props} />
+        <div className="mt-8 flex items-center gap-4">
+          {showScrollTop ? (
+            <button
+              className="btn btn-circle btn-ghost"
+              title="回到顶部"
+              onClick={handleScrollTop}
+            >
+              <Icon icon="formkit:arrowup" className="size-6"></Icon>
+            </button>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TableOfContents;
