@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import type { BlogItem } from "@/components/blog/BlogList";
+import type { BlogFilter } from "@/types/schema";
 import type { NotionRenderer } from "react-notion-x";
 
 export type ExtendedRecordMap = Parameters<
@@ -111,4 +113,26 @@ export function getMapValue<T extends Record<string, any>>(
   } else {
     return map[key];
   }
+}
+
+export function getFilterdBlog(blogs: BlogItem[], filter?: BlogFilter) {
+  const { category, tags, orderby } = filter || {};
+  return blogs
+    .filter((blog) => {
+      if (category && !blog.categories?.includes(category)) {
+        return false; // 排除掉不是该频道的
+      }
+      if (tags?.length && !tags.some((tag) => blog.tags?.includes(tag))) {
+        return false; // 排除掉和当前标签没有任何交集的
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      if (orderby === "latest") {
+        return b.pubDate.getTime() - a.pubDate.getTime();
+      } else {
+        // TODO: 兼容hit语法
+        return 1;
+      }
+    });
 }

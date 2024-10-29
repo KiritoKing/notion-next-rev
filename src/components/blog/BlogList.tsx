@@ -46,7 +46,7 @@ export const BlogListItem: React.FC<
                 <div className="flex items-center gap-2">
                   {props.tags.map((tag) => (
                     <div key={tag} className="badge">
-                      <Link href={`/tag/${tag}`} className="link">
+                      <Link href={`/blog/tag/${tag}`} className="link">
                         #{tag}
                       </Link>
                     </div>
