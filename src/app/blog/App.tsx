@@ -1,14 +1,13 @@
 "use client";
 
-import BlogList from "@/components/blog/BlogList";
-import { NotionContext } from "@/service/notion";
-import { BlogFilter, blogFilterSchema } from "@/types/schema";
-import { getFilterdBlog } from "@/utils/notion";
-import React from "react";
-
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import React from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import BlogList from "@/components/blog/BlogList";
+import CategoryTabs from "@/components/form/CategoryTabs";
+import TagSelector from "@/components/form/TagSelector";
 import {
   Form,
   FormControl,
@@ -16,17 +15,9 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
-import CategoryTabs from "@/components/form/CategoryTabs";
-import TagSelector from "@/components/form/TagSelector";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { NotionContext } from "@/service/notion";
+import { BlogFilter, blogFilterSchema } from "@/types/schema";
+import { getFilterdBlog } from "@/utils/notion";
 
 interface Props {
   context: NotionContext;
@@ -132,7 +123,7 @@ const ClientApp: React.FC<Props> = ({ context }) => {
           /> */}
         </form>
       </Form>
-      <BlogList blogs={blogs} />
+      <BlogList blogs={blogs} pageSize={10} groupByYear />
     </div>
   );
 };

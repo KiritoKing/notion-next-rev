@@ -1,7 +1,7 @@
 import React from "react";
 
-import BlogList from "@/components/blog/BlogList";
 import { getNotionContextWithCache } from "@/service/notion";
+
 import ClientApp from "./App";
 
 const BlogPage = async () => {

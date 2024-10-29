@@ -1,9 +1,15 @@
+"use client";
+
 import { Icon } from "@iconify/react";
 import dayjs from "dayjs";
 import Link from "next/link";
 import React from "react";
 
+import { pagination } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
+
+import Pagination from "../common/Pagination";
+import { groupBy } from "lodash";
 
 export interface BlogItem {
   id: string;
@@ -64,17 +70,67 @@ export const BlogListItem: React.FC<
 interface Props {
   blogs: BlogItem[];
   className?: string;
+  pageSize?: number;
+  groupByYear?: boolean;
 }
 
-const BlogList: React.FC<Props> = ({ blogs, className }) => {
+const BlogList: React.FC<Props> = ({
+  blogs,
+  className,
+  pageSize,
+  groupByYear,
+}) => {
+  const pageNum = pageSize ? Math.ceil(blogs.length / pageSize) : 0;
+  const [currentPage, setCurrentPage] = React.useState(1);
+
+  const pages = React.useMemo(() => {
+    if (pageSize) {
+      return pagination(blogs, pageSize, currentPage);
+    } else {
+      return blogs;
+    }
+  }, [blogs, pageSize, currentPage]);
+
+  const groups = React.useMemo(
+    () =>
+      groupBy(pages, (blog) => {
+        if (groupByYear) {
+          return dayjs(blog.pubDate).format("YYYY");
+        } else {
+          return;
+        }
+      }),
+    [pages, groupByYear],
+  );
+
   return (
-    <ul className={cn("space-y-10", className)}>
-      {blogs.map((blog) => (
-        <li key={blog.id}>
-          <BlogListItem {...blog} />
-        </li>
+    <>
+      {Object.keys(groups).map((key) => (
+        <div key={key}>
+          {key !== "undefined" && (
+            <h4 className="my-4 pl-1 text-2xl font-bold">{key}</h4>
+          )}
+          <ul className={cn("space-y-10", className)}>
+            {groups[key].map((blog) => (
+              <li key={blog.id}>
+                <BlogListItem {...blog} />
+              </li>
+            ))}
+          </ul>
+        </div>
       ))}
-    </ul>
+      {pageNum ? (
+        <Pagination
+          currentPage={currentPage}
+          onClickNumber={setCurrentPage}
+          onClickNext={() => setCurrentPage(currentPage + 1)}
+          onClickPrev={() => setCurrentPage(currentPage - 1)}
+          pageNum={pageNum}
+          showPrevNext
+          className="mt-10"
+        />
+      ) : null}
+    </>
   );
 };
 
