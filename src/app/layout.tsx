@@ -19,7 +19,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="max-w-full overflow-x-hidden antialiased">
+      <body
+        className="max-w-full overflow-x-hidden antialiased"
+        suppressHydrationWarning={process.env.NODE_ENV === "production"}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
