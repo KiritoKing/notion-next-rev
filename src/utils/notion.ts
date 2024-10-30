@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import type { NotionRenderer } from "react-notion-x";
+
 import type { BlogItem } from "@/components/blog/BlogList";
 import type { BlogFilter } from "@/types/schema";
-import type { NotionRenderer } from "react-notion-x";
 
 export type ExtendedRecordMap = Parameters<
   typeof NotionRenderer

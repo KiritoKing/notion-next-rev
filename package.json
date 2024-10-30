@@ -8,7 +8,8 @@
     "format": "prettier --write src",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "start": "next start"
+    "start": "next start",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -57,12 +58,20 @@
     "eslint-plugin-package-json": "^0.15.4",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
+    "husky": "^9.1.6",
     "jsonc-eslint-parser": "^2.4.0",
+    "lint-staged": "^15.2.10",
     "postcss": "^8",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.8",
     "tailwindcss": "^3.4.1",
+    "tsc-files": "^1.1.4",
     "typescript": "^5"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,md}": "prettier --write",
+    "*.{js,jsx,ts,tsx}": "eslint --cache --fix",
+    "*.{ts,tsx}": "tsc-files --noEmit"
   },
   "packageManager": "pnpm@9.12.2+sha512.22721b3a11f81661ae1ec68ce1a7b879425a1ca5b991c975b074ac220b187ce56c708fe5db69f4c962c989452eee76c82877f4ee80f474cebd61ee13461b6228"
 }

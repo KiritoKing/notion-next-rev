@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { X, ChevronDown, ChevronUp, Tag } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, ChevronUp, Tag, X } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+
 import { useControlledState } from "@/hooks/useControlledState";
 
 interface TagSelectorProps {

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { memoize } from "lodash";
 import { LRUCache } from "lru-cache";
 import { NotionAPI } from "notion-client";
 import { cache } from "react";
@@ -13,7 +14,6 @@ import {
   getMappedPropertiesFromPage,
   getMapValue,
 } from "@/utils/notion";
-import { memoize } from "lodash";
 
 const notion = new NotionAPI({
   authToken: process.env.NOTION_TOKEN,

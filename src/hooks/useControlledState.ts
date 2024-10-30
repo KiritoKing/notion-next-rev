@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
+import { useCallback, useState } from "react";
 
 // Either use the callback `setState` signature or just a "void"
 type OnChange<T> = (v: React.SetStateAction<T>) => T | void;

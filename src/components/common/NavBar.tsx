@@ -1,20 +1,20 @@
 "use client";
 
+import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
 import { cn } from "@/lib/utils";
 
-import { LightDarkToggle } from "../ui/light-dark-toggle";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Button } from "../ui/button";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { LightDarkToggle } from "../ui/light-dark-toggle";
 
 type NavItem = {
   title: string;

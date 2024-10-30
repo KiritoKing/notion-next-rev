@@ -1,7 +1,7 @@
+import Link from "next/link";
 import React from "react";
 
 import type { BlogItem } from "./BlogList";
-import Link from "next/link";
 
 interface Props {
   metadata: Partial<BlogItem>;
