@@ -1,8 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import type { NotionRenderer } from "react-notion-x";
 
 import type { BlogItem } from "@/components/blog/BlogList";
 import type { BlogFilter } from "@/types/schema";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export type ExtendedRecordMap = Parameters<
   typeof NotionRenderer
@@ -23,8 +29,19 @@ export type Property = BlockValue["properties"][string];
  * @example
  * const title = extractProperty(block.properties.title);
  */
-export function extractProperty<T = any>(value: Property): T | undefined {
-  return value?.[0]?.[0];
+export function extractStringProperty(value: Property): string | undefined {
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+
+  return value
+    .map((v) => {
+      if (!Array.isArray(v) || v.length < 1) {
+        return "";
+      }
+      return v[0];
+    })
+    .join("");
 }
 
 /**
@@ -38,7 +55,7 @@ export function extractTitleFromPageBlock(block: Block) {
     block.value.properties &&
     block.value.properties.title
   ) {
-    return extractProperty<string>(block.value.properties.title);
+    return extractStringProperty(block.value.properties.title);
   }
 }
 
@@ -64,6 +81,11 @@ export function getMappedPropertiesFromPage(
   return getMappedProperties(properties, schema);
 }
 
+export type MappedProperty = Record<
+  string,
+  { value: string; schema: PropertySchema[string]; raw: string; type: string }
+>;
+
 /**
  * 将Notion API的property对象（rawProps）的key是一个hash-id，其真实名称存储在 `page.collection.schema` 中
  *
@@ -75,18 +97,27 @@ export function getMappedPropertiesFromPage(
 export function getMappedProperties(
   rawProps: any,
   schema: PropertySchema,
-): Record<string, { value: string; schema: PropertySchema[string] }> {
-  const mappedProperties: Record<
-    string,
-    Property & { schema: PropertySchema[string] }
-  > = {};
+): MappedProperty {
+  const mappedProperties: MappedProperty = {};
 
   for (const key in rawProps) {
     const propSchema = schema[key];
     if (propSchema?.name) {
+      let value = extractStringProperty(rawProps[key]) ?? "";
+      if (propSchema.type.includes("date")) {
+        const raw = rawProps[key]?.[0]?.[1]?.[0]?.[1];
+        console.log(raw);
+        if (raw) {
+          value = dayjs
+            .tz(`${raw.start_date} ${raw.start_time ?? ""}`, raw.time_zone)
+            .toISOString();
+        }
+      }
       mappedProperties[propSchema.name] = {
-        value: extractProperty(rawProps[key]),
+        value,
+        type: propSchema.type,
         schema: propSchema,
+        raw: JSON.stringify(rawProps[key]),
       };
     }
   }

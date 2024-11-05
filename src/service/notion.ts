@@ -9,7 +9,7 @@ import type { NotionRenderer } from "react-notion-x";
 import type { BlogItem } from "@/components/blog/BlogList";
 import {
   ExtendedRecordMap,
-  extractProperty,
+  extractStringProperty,
   getMappedProperties,
   getMappedPropertiesFromPage,
   getMapValue,
@@ -65,14 +65,14 @@ export const getPageDataWithCache = cache(
         }
         return acc;
       }, 1);
-      const text = extractProperty(header.properties.title);
+      const text = extractStringProperty(header.properties.title);
       if (!text) {
         return;
       }
       const h: TOCItem = {
         id: header.id.replace(/-/g, ""),
         level,
-        text: extractProperty(header.properties.title) ?? "",
+        text: extractStringProperty(header.properties.title) ?? "",
         parent: null,
       };
       let parent = previousAnchor;
@@ -159,11 +159,14 @@ export async function fetchNotionContext(
         block.properties,
         schema,
       );
+      console.log(tranformedProperties);
       return {
         id: block.id,
         title: tranformedProperties.title?.value,
         tags: tranformedProperties.tag?.value.split(",") ?? [],
-        pubDate: new Date(block.created_time),
+        pubDate: new Date(
+          tranformedProperties.publishAt?.value ?? block.created_time,
+        ),
         categories: tranformedProperties.category?.value.split(",") ?? [],
         excerpt: tranformedProperties.excerpt?.value,
       };

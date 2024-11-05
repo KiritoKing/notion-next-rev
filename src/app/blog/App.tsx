@@ -123,7 +123,7 @@ const ClientApp: React.FC<Props> = ({ context }) => {
           /> */}
         </form>
       </Form>
-      <BlogList blogs={blogs} pageSize={5} groupByYear />
+      <BlogList blogs={blogs} pageSize={10} groupByYear />
     </div>
   );
 };
