@@ -15,7 +15,7 @@ const CategoryTabs = React.forwardRef<HTMLDivElement, Props>(
 
     return (
       <Tabs ref={ref} value={value} onValueChange={setValue}>
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="flex flex-wrap items-center">
           <TabsTrigger value={""}>全部</TabsTrigger>
           {categories.map((category) => (
             <TabsTrigger key={category} value={category}>

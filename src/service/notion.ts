@@ -15,6 +15,8 @@ import {
   getMapValue,
 } from "@/utils/notion";
 
+memoize.Cache = WeakMap; // 使用weakMap
+
 const notion = new NotionAPI({
   authToken: process.env.NOTION_TOKEN,
 });
@@ -159,7 +161,6 @@ export async function fetchNotionContext(
         block.properties,
         schema,
       );
-      console.log(tranformedProperties);
       return {
         id: block.id,
         title: tranformedProperties.title?.value,
@@ -202,8 +203,8 @@ export async function fetchNotionContext(
   return context;
 }
 
-const memoizedFetchNotionContext = memoize(fetchNotionContext);
-export const getNotionContextWithCache = cache(memoizedFetchNotionContext);
+const memoizedFetchNotionContext = memoize(fetchNotionContext, (id) => [id]);
+export const getNotionContextWithCache = cache(fetchNotionContext);
 
 export const clearCache = () => {
   pageCache.clear();

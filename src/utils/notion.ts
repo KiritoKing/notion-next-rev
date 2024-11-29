@@ -106,7 +106,6 @@ export function getMappedProperties(
       let value = extractStringProperty(rawProps[key]) ?? "";
       if (propSchema.type.includes("date")) {
         const raw = rawProps[key]?.[0]?.[1]?.[0]?.[1];
-        console.log(raw);
         if (raw) {
           value = dayjs
             .tz(`${raw.start_date} ${raw.start_time ?? ""}`, raw.time_zone)

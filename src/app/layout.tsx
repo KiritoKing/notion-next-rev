@@ -4,8 +4,10 @@ import "react-notion-x/src/styles.css";
 
 import type { Metadata } from "next";
 
+import Footer from "@/components/common/Footer";
 import NavBar from "@/components/common/NavBar";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "ChlorineC's Blog",
@@ -31,6 +33,8 @@ export default function RootLayout({
         >
           <NavBar title="ChlorineC's Blog" />
           {children}
+          <Footer />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
