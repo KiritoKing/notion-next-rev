@@ -105,20 +105,22 @@ const BlogList: React.FC<Props> = ({
 
   return (
     <>
-      {Object.keys(groups).map((key) => (
-        <div key={key}>
-          {key !== "undefined" && (
-            <h4 className="my-4 pl-1 text-2xl font-bold">{key}</h4>
-          )}
-          <ul className={cn("space-y-10", className)}>
-            {groups[key].map((blog) => (
-              <li key={blog.id}>
-                <BlogListItem {...blog} />
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+      {Object.keys(groups)
+        .sort((a, b) => parseInt(b) - parseInt(a))
+        .map((key) => (
+          <div key={key}>
+            {key !== "undefined" && (
+              <h4 className="my-4 pl-1 text-2xl font-bold">{key}</h4>
+            )}
+            <ul className={cn("space-y-10", className)}>
+              {groups[key].map((blog) => (
+                <li key={blog.id}>
+                  <BlogListItem {...blog} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       {pageNum ? (
         <Pagination
           currentPage={currentPage}
