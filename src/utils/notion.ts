@@ -2,7 +2,7 @@
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import type { NotionRenderer } from "react-notion-x";
+import type { ExtendedRecordMap } from "notion-types";
 
 import type { BlogItem } from "@/components/blog/BlogList";
 import type { BlogFilter } from "@/types/schema";
@@ -10,9 +10,6 @@ import type { BlogFilter } from "@/types/schema";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export type ExtendedRecordMap = Parameters<
-  typeof NotionRenderer
->[0]["recordMap"];
 export type Collection = ExtendedRecordMap["collection"][string];
 export type CollectionValue = Collection["value"];
 export type PropertySchema = CollectionValue["schema"];

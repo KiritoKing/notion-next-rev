@@ -3,12 +3,12 @@ import "server-only";
 import { memoize } from "lodash";
 import { LRUCache } from "lru-cache";
 import { NotionAPI } from "notion-client";
+import type { ExtendedRecordMap } from "notion-types";
 import { cache } from "react";
 import type { NotionRenderer } from "react-notion-x";
 
 import type { BlogItem } from "@/components/blog/BlogList";
 import {
-  ExtendedRecordMap,
   extractStringProperty,
   getMappedProperties,
   getMappedPropertiesFromPage,
@@ -120,6 +120,8 @@ export async function fetchNotionContext(
 
   const databasePage = await notion.getPage(databaseId);
 
+  console.log(databasePage);
+
   const blockMap = databasePage.block;
   const collection = getMapValue(databasePage.collection)?.value;
 
@@ -130,7 +132,7 @@ export async function fetchNotionContext(
   const schema = collection.schema;
 
   const tableView = Object.values(databasePage.collection_view).find(
-    (value) => value.value.type === "table",
+    (value) => value.value.type === "table" && value.value.name === "博客管理", // TODO: 支持配置视图名称
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) as any;
   if (!tableView) {
@@ -171,7 +173,8 @@ export async function fetchNotionContext(
         categories: tranformedProperties.category?.value.split(",") ?? [],
         excerpt: tranformedProperties.excerpt?.value,
       };
-    });
+    })
+    .sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
 
   pageEntries.forEach((item) => {
     if (item.tags) {
